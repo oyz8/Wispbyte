@@ -542,29 +542,29 @@ def login(sb, email: str, password: str) -> bool:
     sb.uc_open_with_reconnect(LOGIN_URL, reconnect_time=10)
     time.sleep(4)
     try:
-        sb.wait_for_element_visible('input#email', timeout=15)
+        sb.wait_for_element_visible('input#login-email', timeout=15)
         log("✅ 找到登录表单")
     except TimeoutException:
         log("未找到登录表单，重新连接...", "WARN")
         sb.uc_open_with_reconnect(LOGIN_URL, reconnect_time=10)
         time.sleep(5)
         try:
-            sb.wait_for_element_visible('input#email', timeout=10)
+            sb.wait_for_element_visible('input#login-email', timeout=10)
         except TimeoutException:
             log("仍然未找到登录表单", "ERROR")
             return False
-    sb.type('input#email', email)
+    sb.type('input#login-email', email)
     time.sleep(0.5)
-    sb.type('input#password', password)
+    sb.type('input#login-password', password)
     time.sleep(0.5)
     if not wait_for_turnstile_success(sb, timeout=35):
         log("登录 Turnstile 未通过", "ERROR")
-        return False
+        return False    
     log("提交登录...")
     try:
-        sb.click('button.login-btn')
+        sb.click('button.auth-submit')
     except Exception:
-        sb.execute_script('document.querySelector("form#login-form").submit()')
+        sb.execute_script('document.querySelector("button[type=submit]").click()')
     log("等待跳转到仪表盘...")
     for _ in range(15):
         if "/dashboard" in sb.get_current_url() or "/client/dashboard" in sb.get_current_url():
